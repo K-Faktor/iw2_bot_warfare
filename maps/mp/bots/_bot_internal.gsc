@@ -422,8 +422,12 @@ onWeaponChange()
 		{
 			first = false;
 			newWeapon = self getcurrentweapon();
+			
 			// hack fix for botstop overridding weapon
-			self switchtoweapon( newWeapon );
+			if ( newWeapon != "none" )
+			{
+				self switchtoweapon( newWeapon );
+			}
 		}
 		else
 		{
