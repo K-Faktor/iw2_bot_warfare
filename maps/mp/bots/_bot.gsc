@@ -486,7 +486,7 @@ killTags()
 	{
 		for ( i = 0; i < self.tags.size; i++ )
 		{
-			self.tags[ i ] delete();
+			self.tags[ i ] delete ();
 		}
 		
 		self.tags = undefined;
@@ -518,6 +518,14 @@ onDisconnectPlayer()
 	self killTags();
 	
 	level.players = array_remove( level.players, self );
+	
+	waittillframeend;
+	
+	for ( i = 0; i < level.bots.size; i++ )
+	{
+		bot = level.bots[ i ];
+		bot BotNotifyBotEvent( "connection", "disconnected", self, self.name );
+	}
 }
 
 /*
@@ -538,6 +546,13 @@ connected()
 	self endon( "disconnect" );
 	
 	level.players[ level.players.size ] = self;
+	
+	for ( i = 0; i < level.bots.size; i++ )
+	{
+		bot = level.bots[ i ];
+		bot BotNotifyBotEvent( "connection", "connected", self, self.name );
+	}
+	
 	self thread onDisconnectPlayer();
 	
 	if ( !isdefined( self.pers[ "bot_host" ] ) )
@@ -1181,7 +1196,7 @@ watchNade()
 		if ( timeSlow > 1 )
 		{
 			thread launchSmoke( lastOrigin );
-			self delete();
+			self delete ();
 		}
 		
 		wait 0.05;
