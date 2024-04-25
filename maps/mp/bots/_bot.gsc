@@ -517,6 +517,8 @@ onDeath()
 */
 onDisconnectPlayer()
 {
+	name = self.name;
+
 	self waittill( "disconnect" );
 	self killTags();
 	
@@ -527,7 +529,7 @@ onDisconnectPlayer()
 	for ( i = 0; i < level.bots.size; i++ )
 	{
 		bot = level.bots[ i ];
-		bot BotNotifyBotEvent( "connection", "disconnected", self, self.name );
+		bot BotNotifyBotEvent( "connection", "disconnected", self, name );
 	}
 }
 
