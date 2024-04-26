@@ -277,6 +277,7 @@ init()
 	level thread handleBots();
 	level thread watchNades();
 	level thread watchGameEnded();
+	level thread onPlayerChat();
 	
 	level.teambased = true;
 	
@@ -518,7 +519,7 @@ onDeath()
 onDisconnectPlayer()
 {
 	name = self.name;
-
+	
 	self waittill( "disconnect" );
 	self killTags();
 	
@@ -1277,4 +1278,22 @@ watchGameEnded()
 	
 	level.gameended = true;
 	level notify( "game_ended" );
+}
+
+/*
+	When a player chats
+*/
+onPlayerChat()
+{
+	for ( ;; )
+	{
+		level waittill( "say", message, player, is_hidden );
+		
+		for ( i = 0; i < level.bots.size; i++ )
+		{
+			bot = level.bots[ i ];
+			
+			bot BotNotifyBotEvent( "chat", "chat", message, player, is_hidden );
+		}
+	}
 }
