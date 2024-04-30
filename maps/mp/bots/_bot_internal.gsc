@@ -422,12 +422,6 @@ onWeaponChange()
 		{
 			first = false;
 			newWeapon = self getcurrentweapon();
-			
-			// hack fix for botstop overridding weapon
-			if ( newWeapon != "none" )
-			{
-				self switchtoweapon( newWeapon );
-			}
 		}
 		else
 		{
@@ -1277,7 +1271,7 @@ aim_loop()
 					
 					conedot = getConeDot( aimpos, eyePos, angles );
 					
-					if ( !nadeAimOffset && conedot > 0.999 && lengthsquared( aimoffset ) < 0.05 )
+					if ( !nadeAimOffset && conedot > 0.999995 && lengthsquared( aimoffset ) < 0.05 )
 					{
 						self thread bot_lookat( aimpos, 0.05 );
 					}
@@ -1295,7 +1289,7 @@ aim_loop()
 					
 					conedot = getConeDot( aimpos, eyePos, angles );
 					
-					if ( !nadeAimOffset && conedot > 0.999 && lengthsquared( aimoffset ) < 0.05 )
+					if ( !nadeAimOffset && conedot > 0.999995 && lengthsquared( aimoffset ) < 0.05 )
 					{
 						self thread bot_lookat( aimpos, 0.05 );
 					}
@@ -2422,7 +2416,7 @@ bot_lookat( pos, time, vel, doAimPredict )
 	for ( i = 0; i < steps; i++ )
 	{
 		myAngle = ( AngleClamp180( myAngle[ 0 ] + X ), AngleClamp180( myAngle[ 1 ] + Y ), 0 );
-		self setplayerangles( myAngle );
+		self BotBuiltinBotAngles( myAngle );
 		wait 0.05;
 	}
 }

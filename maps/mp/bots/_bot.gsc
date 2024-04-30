@@ -1088,11 +1088,11 @@ addBots_loop()
 	if ( fillMode == 0 || fillMode == 2 )
 	{
 		amount += players;
-	}
-	
-	if ( getcvarint( "bots_manage_fill_spec" ) )
-	{
-		amount += spec;
+		
+		if ( getcvarint( "bots_manage_fill_spec" ) )
+		{
+			amount += spec;
+		}
 	}
 	
 	if ( amount < fillAmount )

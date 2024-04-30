@@ -86,6 +86,17 @@ BotBuiltinIsBot()
 }
 
 /*
+	Sets angles
+*/
+BotBuiltinBotAngles( angles )
+{
+	if ( isdefined( level.bot_builtins ) && isdefined( level.bot_builtins[ "botangles" ] ) )
+	{
+		self [[ level.bot_builtins[ "botangles" ] ]]( angles );
+	}
+}
+
+/*
 	Returns if player is the host
 */
 is_host()
