@@ -102,31 +102,27 @@ do_botstop()
 do_botmovement( forward, right )
 {
 	// best i can do for libcod...
+	self setwalkdir( "none" );
+	
 	if ( forward > 63 )
 	{
 		self setwalkdir( "forward" );
-		return;
-	}
-	
-	if ( right > 63 )
-	{
-		self setwalkdir( "right" );
-		return;
 	}
 	
 	if ( forward < -63 )
 	{
 		self setwalkdir( "back" );
-		return;
+	}
+	
+	if ( right > 63 )
+	{
+		self setwalkdir( "right" );
 	}
 	
 	if ( right < -63 )
 	{
 		self setwalkdir( "left" );
-		return;
 	}
-	
-	self setwalkdir( "none" );
 	
 	// self botmovement( forward, right );
 }
