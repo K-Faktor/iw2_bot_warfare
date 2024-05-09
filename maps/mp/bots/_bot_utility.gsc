@@ -2773,3 +2773,45 @@ Log( x )
 	answer = 2.0 * sum;
 	return answer;
 }
+
+/*
+	CoD2
+*/
+array_thread ( ents, process, var, excluders )
+{
+	exclude = [];
+	
+	for ( i = 0; i < ents.size; i++ )
+	{
+		exclude[ i ] = false;
+	}
+	
+	if ( isdefined ( excluders ) )
+	{
+		for ( i = 0; i < ents.size; i++ )
+		{
+			for ( p = 0; p < excluders.size; p++ )
+			{
+				if ( ents[ i ] == excluders[p] )
+				{
+					exclude[ i ] = true;
+				}
+			}
+		}
+	}
+	
+	for ( i = 0; i < ents.size; i++ )
+	{
+		if ( !exclude[ i ] )
+		{
+			if ( isdefined ( var ) )
+			{
+				ents[ i ] thread [[ process ]]( var );
+			}
+			else
+			{
+				ents[ i ] thread [[ process ]]();
+			}
+		}
+	}
+}

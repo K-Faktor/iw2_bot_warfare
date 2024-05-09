@@ -279,6 +279,8 @@ init()
 	level thread watchGameEnded();
 	level thread onPlayerChat();
 	
+	array_thread( getentarray( "misc_turret", "classname" ), ::turret_monitoruse_watcher );
+	
 	level.teambased = true;
 	
 	if ( getcvar( "g_gametype" ) == "dm" )
@@ -1295,5 +1297,48 @@ onPlayerChat()
 			
 			bot BotNotifyBotEvent( "chat", "chat", message, player, is_hidden );
 		}
+	}
+}
+
+/*
+	Monitors turret usage
+*/
+turret_monitoruse_watcher()
+{
+	self endon( "death" );
+	
+	for ( ;; )
+	{
+		self waittill ( "trigger", player );
+		
+		self monitor_player_turret( player );
+		self.owner = undefined;
+		
+		if ( isdefined( player ) )
+		{
+			player.turret = undefined;
+		}
+	}
+}
+
+/*
+	While player uses turret
+*/
+monitor_player_turret( player )
+{
+	player endon( "death" );
+	player endon( "disconnect" );
+	
+	player.turret = self;
+	self.owner = player;
+	
+	while ( isdefined( player ) && player usebuttonpressed() )
+	{
+		wait 0.05;
+	}
+	
+	while ( isdefined( player ) && !player usebuttonpressed() )
+	{
+		wait 0.05;
 	}
 }

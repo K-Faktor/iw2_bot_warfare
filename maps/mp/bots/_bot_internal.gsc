@@ -328,6 +328,13 @@ watchPickupGun()
 			continue;
 		}
 		
+		// todo have bots use turrets instead of just kicking them off of it
+		if ( isdefined( self.turret ) )
+		{
+			self thread use( 0.5 );
+			continue;
+		}
+		
 		weap = self getcurrentweapon();
 		
 		if ( weap != "none" && self getAmmoCount( weap ) )
