@@ -1097,7 +1097,7 @@ addBots_loop()
 			
 			if ( isdefined( tempBot ) )
 			{
-				kick( tempBot getentitynumber() );
+				kick( tempBot getentitynumber(), "EXE_PLAYERKICKED" );
 				
 				wait 0.25;
 			}
