@@ -2777,7 +2777,7 @@ Log( x )
 /*
 	CoD2
 */
-array_thread ( ents, process, var, excluders )
+array_thread( ents, process, var, excluders )
 {
 	exclude = [];
 	
