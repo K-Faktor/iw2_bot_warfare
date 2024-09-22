@@ -851,7 +851,7 @@ bot_weapon_think_loop( data )
 			continue;
 		}
 		
-		if ( isWeaponDroppable( weapon ) )
+		if ( !isWeaponDroppable( weapon ) )
 		{
 			continue;
 		}

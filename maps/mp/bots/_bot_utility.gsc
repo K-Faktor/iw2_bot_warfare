@@ -1383,7 +1383,7 @@ parseTokensIntoWaypoint( tokens )
 readWpsFromFile( mapname )
 {
 	waypoints = [];
-	filename = mapname + "_wp.csv";
+	filename = "waypoints/" + mapname + "_wp.csv";
 	f = openfile( filename, "read" );
 	
 	if ( f < 0 )
