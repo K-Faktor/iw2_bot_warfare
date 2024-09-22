@@ -6,7 +6,7 @@
 */
 init()
 {
-	level.bw_version = "2.2.0 PR 1";
+	level.bw_version = "2.3.0 PR 1";
 	
 	if ( getcvar( "bots_main" ) == "" )
 	{
@@ -43,7 +43,7 @@ init()
 	
 	if ( getcvar( "bots_main_kickBotsAtEnd" ) == "" )
 	{
-		setcvar( "bots_main_kickBotsAtEnd", false ); // kicks the bots at game end
+		setcvar( "bots_main_kickBotsAtEnd", true ); // kicks the bots at game end
 	}
 	
 	if ( getcvar( "bots_manage_add" ) == "" )
@@ -70,7 +70,7 @@ init()
 	{
 		setcvar( "bots_manage_fill_kick", false ); // kick bots if too many
 	}
-
+	
 	if ( getcvar( "bots_manage_fill_watchplayers" ) == "" )
 	{
 		setcvar( "bots_manage_fill_watchplayers", false ); // add bots when player exists, kick if not

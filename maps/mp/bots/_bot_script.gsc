@@ -9,6 +9,11 @@ added()
 	self endon( "disconnect" );
 	
 	self set_diff();
+	
+	if ( randomfloatrange( 0, 1 ) < 0.5 )
+	{
+		self.pers[ "bots" ][ "behavior" ][ "quickscope" ] = true;
+	}
 }
 
 /*
@@ -662,4 +667,226 @@ start_bot_threads()
 	self endon( "disconnect" );
 	level endon( "game_ended" );
 	self endon( "death" );
+	
+	self thread doReloadCancel();
+	self thread bot_weapon_think();
+}
+
+/*
+	Changes to the weap
+*/
+changeToWeapon( weap )
+{
+	self endon( "disconnect" );
+	self endon( "death" );
+	level endon( "game_ended" );
+	
+	if ( !self hasweapon( weap ) )
+	{
+		return false;
+	}
+	
+	self BotBuiltinBotWeapon( weap );
+	
+	if ( self getcurrentweapon() == weap )
+	{
+		return true;
+	}
+	
+	self waittill_any_timeout( 5, "weapon_change" );
+	
+	return ( self getcurrentweapon() == weap );
+}
+
+/*
+	Reload cancels
+*/
+doReloadCancel_loop()
+{
+	ret = self waittill_either_return( "reload", "weapon_change" );
+	
+	if ( self BotIsFrozen() )
+	{
+		return;
+	}
+	
+	if ( self isPlantingOrDefusing() )
+	{
+		return;
+	}
+	
+	curWeap = self getcurrentweapon();
+	
+	if ( !isWeaponDroppable( curWeap ) )
+	{
+		return;
+	}
+	
+	if ( ret == "reload" )
+	{
+		// check single reloads
+		if ( self getweaponslotclipammo( getWeaponSlot( curWeap ) ) < WeaponClipSize( curWeap ) )
+		{
+			return;
+		}
+	}
+	
+	// check difficulty
+	if ( self.pers[ "bots" ][ "skill" ][ "base" ] <= 3 )
+	{
+		return;
+	}
+	
+	// check if got another weapon
+	weaponslist = self getWeaponsListPrimaries();
+	weap = "";
+	
+	while ( weaponslist.size )
+	{
+		weapon = weaponslist[ randomint( weaponslist.size ) ];
+		weaponslist = array_remove( weaponslist, weapon );
+		
+		if ( !isWeaponDroppable( curWeap ) )
+		{
+			continue;
+		}
+		
+		if ( curWeap == weapon || weapon == "none" || weapon == "" )
+		{
+			continue;
+		}
+		
+		weap = weapon;
+		break;
+	}
+	
+	if ( weap == "" )
+	{
+		return;
+	}
+	
+	// do the cancel
+	wait 0.1;
+	self thread changeToWeapon( weap );
+	wait 0.25;
+	self thread changeToWeapon( curWeap );
+	wait 2;
+}
+
+/*
+	Reload cancels
+*/
+doReloadCancel()
+{
+	self endon( "disconnect" );
+	self endon( "death" );
+	
+	for ( ;; )
+	{
+		self doReloadCancel_loop();
+	}
+}
+
+/*
+	Bot logic for switching weapons.
+*/
+bot_weapon_think_loop( data )
+{
+	ret = self waittill_any_timeout( randomintrange( 2, 4 ), "bot_force_check_switch" );
+	
+	if ( self BotIsFrozen() )
+	{
+		return;
+	}
+	
+	if ( self isPlantingOrDefusing() )
+	{
+		return;
+	}
+	
+	hasTarget = self HasThreat();
+	curWeap = self getcurrentweapon();
+	
+	force = ( ret == "bot_force_check_switch" );
+	
+	if ( data.first )
+	{
+		data.first = false;
+		
+		if ( randomint( 100 ) > self.pers[ "bots" ][ "behavior" ][ "initswitch" ] )
+		{
+			return;
+		}
+	}
+	else
+	{
+		if ( curWeap != "none" && self getAmmoCount( curWeap ) )
+		{
+			if ( randomint( 100 ) > self.pers[ "bots" ][ "behavior" ][ "switch" ] )
+			{
+				return;
+			}
+			
+			if ( hasTarget )
+			{
+				return;
+			}
+		}
+		else
+		{
+			force = true;
+		}
+	}
+	
+	weaponslist = self getWeaponsListPrimaries();
+	weap = "";
+	
+	while ( weaponslist.size )
+	{
+		weapon = weaponslist[ randomint( weaponslist.size ) ];
+		weaponslist = array_remove( weaponslist, weapon );
+		
+		if ( !self getAmmoCount( weapon ) && !force )
+		{
+			continue;
+		}
+		
+		if ( isWeaponDroppable( weapon ) )
+		{
+			continue;
+		}
+		
+		if ( curWeap == weapon || weapon == "none" || weapon == "" )
+		{
+			continue;
+		}
+		
+		weap = weapon;
+		break;
+	}
+	
+	if ( weap == "" )
+	{
+		return;
+	}
+	
+	self thread changeToWeapon( weap );
+}
+
+/*
+	Bot logic for switching weapons.
+*/
+bot_weapon_think()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	level endon( "game_ended" );
+	
+	data = spawnstruct();
+	data.first = true;
+	
+	for ( ;; )
+	{
+		self bot_weapon_think_loop( data );
+	}
 }

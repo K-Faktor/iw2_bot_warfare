@@ -97,6 +97,17 @@ BotBuiltinBotAngles( angles )
 }
 
 /*
+	Sets weapon
+*/
+BotBuiltinBotWeapon( weapon )
+{
+	if ( isdefined( level.bot_builtins ) && isdefined( level.bot_builtins[ "botweapon" ] ) )
+	{
+		self [[ level.bot_builtins[ "botweapon" ] ]]( weapon );
+	}
+}
+
+/*
 	Returns if player is the host
 */
 is_host()
@@ -479,6 +490,11 @@ ClearPriorityObjective()
 	self notify( "kill_goal" );
 }
 
+isPlantingOrDefusing()
+{
+	return isdefined( self.progressbackground );
+}
+
 /*
 	If the site is in use
 */
@@ -589,6 +605,16 @@ getWeaponSlot( weap )
 	{
 		return "primaryb";
 	}
+}
+
+getWeaponsListPrimaries()
+{
+	answer = [];
+	
+	answer[ answer.size ] = self getweaponslotweapon( "primary" );
+	answer[ answer.size ] = self getweaponslotweapon( "primaryb" );
+	
+	return answer;
 }
 
 /*
