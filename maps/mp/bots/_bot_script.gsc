@@ -725,7 +725,7 @@ doReloadCancel_loop()
 	if ( ret == "reload" )
 	{
 		// check single reloads
-		if ( self getweaponslotclipammo( getWeaponSlot( curWeap ) ) < WeaponClipSize( curWeap ) )
+		if ( self getweaponslotclipammo( self getWeaponSlot( curWeap ) ) < WeaponClipSize( curWeap ) )
 		{
 			return;
 		}
