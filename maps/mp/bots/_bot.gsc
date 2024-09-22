@@ -233,8 +233,8 @@ init()
 	level.bots_weapon_clip_sizes[ "enfield_mp" ] = 10;
 	level.bots_weapon_clip_sizes[ "bren_mp" ] = 30;
 	level.bots_weapon_clip_sizes[ "enfield_scope_mp" ] = 10;
-	level.bots_weapon_clip_sizes[ "svt40_mp" ] = 10;
-	level.bots_weapon_clip_sizes[ "pps42_mp" ] = 35;
+	level.bots_weapon_clip_sizes[ "SVT40_mp" ] = 10;
+	level.bots_weapon_clip_sizes[ "PPS42_mp" ] = 35;
 	level.bots_weapon_clip_sizes[ "ppsh_mp" ] = 71;
 	level.bots_weapon_clip_sizes[ "g43_mp" ] = 10;
 	level.bots_weapon_clip_sizes[ "mosin_nagant_mp" ] = 5;
@@ -246,7 +246,7 @@ init()
 	level.bots_weapon_clip_sizes[ "colt_mp" ] = 7;
 	level.bots_weapon_clip_sizes[ "webley_mp" ] = 6;
 	level.bots_weapon_clip_sizes[ "luger_mp" ] = 8;
-	level.bots_weapon_clip_sizes[ "tt30_mp" ] = 8;
+	level.bots_weapon_clip_sizes[ "TT30_mp" ] = 8;
 	level.bots_weapon_clip_sizes[ "greasegun_mp" ] = 32;
 	
 	level.bots_weapon_class_names = [];
@@ -260,8 +260,8 @@ init()
 	level.bots_weapon_class_names[ "enfield_mp" ] = "sniper";
 	level.bots_weapon_class_names[ "bren_mp" ] = "lmg";
 	level.bots_weapon_class_names[ "enfield_scope_mp" ] = "sniper";
-	level.bots_weapon_class_names[ "svt40_mp" ] = "rifle";
-	level.bots_weapon_class_names[ "pps42_mp" ] = "smg";
+	level.bots_weapon_class_names[ "SVT40_mp" ] = "rifle";
+	level.bots_weapon_class_names[ "PPS42_mp" ] = "smg";
 	level.bots_weapon_class_names[ "ppsh_mp" ] = "smg";
 	level.bots_weapon_class_names[ "g43_mp" ] = "rifle";
 	level.bots_weapon_class_names[ "mosin_nagant_mp" ] = "sniper";
@@ -273,7 +273,7 @@ init()
 	level.bots_weapon_class_names[ "colt_mp" ] = "pistol";
 	level.bots_weapon_class_names[ "webley_mp" ] = "pistol";
 	level.bots_weapon_class_names[ "luger_mp" ] = "pistol";
-	level.bots_weapon_class_names[ "tt30_mp" ] = "pistol";
+	level.bots_weapon_class_names[ "TT30_mp" ] = "pistol";
 	level.bots_weapon_class_names[ "greasegun_mp" ] = "smg";
 	
 	level thread fixGamemodes();

@@ -71,10 +71,10 @@ setup_weaponid_map()
 		case "russian":
 			register_weaponid( "frag_grenade_russian_mp" );
 			register_weaponid( "smoke_grenade_russian_mp" );
-			register_weaponid( "tt30_mp" );
+			register_weaponid( "TT30_mp" );
 			register_weaponid( "mosin_nagant_mp" );
-			register_weaponid( "svt40_mp" );
-			register_weaponid( "pps42_mp" );
+			register_weaponid( "SVT40_mp" );
+			register_weaponid( "PPS42_mp" );
 			register_weaponid( "ppsh_mp" );
 			register_weaponid( "mosin_nagant_sniper_mp" );
 			register_weaponid( "shotgun_mp" );
