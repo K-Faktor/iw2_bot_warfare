@@ -670,6 +670,20 @@ start_bot_threads()
 	
 	self thread doReloadCancel();
 	self thread bot_weapon_think();
+
+	self thread bot_revenge_think();
+	self thread follow_target();
+	self thread bot_listen_to_steps();
+	self thread bot_uav_think();
+
+	if ( getdvarint( "bots_play_nade" ) )
+	{
+		// self thread bot_use_grenade_think();
+	}
+
+	if ( getdvarint( "bots_play_obj" ) )
+	{
+	}
 }
 
 /*
@@ -696,6 +710,335 @@ changeToWeapon( weap )
 	self waittill_any_timeout( 5, "weapon_change" );
 	
 	return ( self getcurrentweapon() == weap );
+}
+
+/*
+	Clears goal when events death
+*/
+stop_go_target_on_death( tar )
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	self endon( "new_goal" );
+	self endon( "bad_path" );
+	self endon( "goal" );
+	
+	tar waittill_either( "death", "disconnect" );
+	
+	self ClearScriptGoal();
+}
+
+/*
+	Bot logic for UAV detection here. Checks for UAV and players who are shooting.
+*/
+bot_uav_think_loop()
+{
+	dist = self.pers[ "bots" ][ "skill" ][ "help_dist" ];
+	dist *= dist * 8;
+	
+	for ( i = level.players.size - 1; i >= 0; i-- )
+	{
+		player = level.players[ i ];
+		
+		if ( !player IsPlayerModelOK() )
+		{
+			continue;
+		}
+		
+		if ( player == self )
+		{
+			continue;
+		}
+		
+		if ( !isdefined( player.team ) )
+		{
+			continue;
+		}
+		
+		if ( player.sessionstate != "playing" )
+		{
+			continue;
+		}
+		
+		if ( level.teambased && player.team == self.team )
+		{
+			continue;
+		}
+		
+		if ( !isalive( player ) )
+		{
+			continue;
+		}
+		
+		distFromPlayer = distancesquared( self.origin, player.origin );
+		
+		if ( distFromPlayer > dist )
+		{
+			continue;
+		}
+		
+		if ( player.bots_firing )
+		{
+			self BotNotifyBotEvent( "uav_target", "start", player );
+			
+			distSq = self.pers[ "bots" ][ "skill" ][ "help_dist" ] * self.pers[ "bots" ][ "skill" ][ "help_dist" ];
+			
+			if ( distFromPlayer < distSq && bullettracepassed( self getEyePos(), player getTagOrigin( "j_spine4" ), false, player ) )
+			{
+				self SetAttacker( player );
+			}
+			
+			if ( !self HasScriptGoal() && !self.bot_lock_goal )
+			{
+				self SetScriptGoal( player.origin, 128 );
+				self thread stop_go_target_on_death( player );
+				
+				if ( self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal" )
+				{
+					self ClearScriptGoal();
+				}
+				
+				self BotNotifyBotEvent( "uav_target", "stop", player );
+			}
+			
+			break;
+		}
+	}
+}
+
+/*
+	Bot logic for UAV detection here. Checks for UAV and players who are shooting.
+*/
+bot_uav_think()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	
+	for ( ;; )
+	{
+		wait 0.75;
+		
+		if ( self.pers[ "bots" ][ "skill" ][ "base" ] <= 1 )
+		{
+			continue;
+		}
+		
+		self bot_uav_think_loop();
+	}
+}
+
+/*
+	Bot logic for detecting nearby players.
+*/
+bot_listen_to_steps_loop()
+{
+	dist = level.bots_listendist;
+	
+	dist *= dist;
+	
+	heard = undefined;
+	
+	for ( i = level.players.size - 1 ; i >= 0; i-- )
+	{
+		player = level.players[ i ];
+		
+		if ( !player IsPlayerModelOK() )
+		{
+			continue;
+		}
+		
+		if ( player == self )
+		{
+			continue;
+		}
+		
+		if ( level.teambased && self.team == player.team )
+		{
+			continue;
+		}
+		
+		if ( player.sessionstate != "playing" )
+		{
+			continue;
+		}
+		
+		if ( !isalive( player ) )
+		{
+			continue;
+		}
+		
+		if ( lengthsquared( player getVelocity() ) < 20000 )
+		{
+			continue;
+		}
+		
+		if ( distancesquared( player.origin, self.origin ) > dist )
+		{
+			continue;
+		}
+		
+		heard = player;
+		break;
+	}
+	
+	if ( !isdefined( heard ) )
+	{
+		return;
+	}
+	
+	self BotNotifyBotEvent( "heard_target", "start", heard );
+	
+	if ( bullettracepassed( self getEyePos(), heard getTagOrigin( "j_spine4" ), false, heard ) )
+	{
+		self SetAttacker( heard );
+		return;
+	}
+	
+	if ( self HasScriptGoal() || self.bot_lock_goal )
+	{
+		return;
+	}
+	
+	self SetScriptGoal( heard.origin, 64 );
+	
+	if ( self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal" )
+	{
+		self ClearScriptGoal();
+	}
+	
+	self BotNotifyBotEvent( "heard_target", "stop", heard );
+}
+
+/*
+	Bot logic for detecting nearby players.
+*/
+bot_listen_to_steps()
+{
+	self endon( "disconnect" );
+	self endon( "death" );
+	
+	for ( ;; )
+	{
+		wait 1;
+		
+		if ( self.pers[ "bots" ][ "skill" ][ "base" ] < 3 )
+		{
+			continue;
+		}
+		
+		self bot_listen_to_steps_loop();
+	}
+}
+
+/*
+	Goes to the target's location if it had one
+*/
+follow_target_loop()
+{
+	threat = self getThreat();
+	
+	if ( !isplayer( threat ) )
+	{
+		return;
+	}
+	
+	if ( randomint( 100 ) > self.pers[ "bots" ][ "behavior" ][ "follow" ] * 5 )
+	{
+		return;
+	}
+	
+	self BotNotifyBotEvent( "follow_threat", "start", threat );
+	
+	self SetScriptGoal( threat.origin, 64 );
+	self thread stop_go_target_on_death( threat );
+	
+	if ( self waittill_any_return( "new_goal", "goal", "bad_path" ) != "new_goal" )
+	{
+		self ClearScriptGoal();
+	}
+	
+	self BotNotifyBotEvent( "follow_threat", "stop", threat );
+}
+
+/*
+	Goes to the target's location if it had one
+*/
+follow_target()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	
+	for ( ;; )
+	{
+		wait 1;
+		
+		if ( self HasScriptGoal() || self.bot_lock_goal )
+		{
+			continue;
+		}
+		
+		if ( !self HasThreat() )
+		{
+			continue;
+		}
+		
+		self follow_target_loop();
+	}
+}
+
+/*
+	bots will go to their target's kill location
+*/
+bot_revenge_think()
+{
+	self endon( "death" );
+	self endon( "disconnect" );
+	
+	if ( self.pers[ "bots" ][ "skill" ][ "base" ] <= 1 )
+	{
+		return;
+	}
+	
+	if ( isdefined( self.lastkiller ) && isalive( self.lastkiller ) )
+	{
+		if ( bullettracepassed( self getEyePos(), self.lastkiller getTagOrigin( "j_spine4" ), false, self.lastkiller ) )
+		{
+			self SetAttacker( self.lastkiller );
+		}
+	}
+	
+	if ( !isdefined( self.killerlocation ) )
+	{
+		return;
+	}
+	
+	loc = self.killerlocation;
+	
+	for ( ;; )
+	{
+		wait( randomintrange( 1, 5 ) );
+		
+		if ( self HasScriptGoal() || self.bot_lock_goal )
+		{
+			return;
+		}
+		
+		if ( randomint( 100 ) < 75 )
+		{
+			return;
+		}
+		
+		self BotNotifyBotEvent( "revenge", "start", loc, self.lastkiller );
+		
+		self SetScriptGoal( loc, 64 );
+		
+		if ( self waittill_any_return( "goal", "bad_path", "new_goal" ) != "new_goal" )
+		{
+			self ClearScriptGoal();
+		}
+		
+		self BotNotifyBotEvent( "revenge", "stop", loc, self.lastkiller );
+	}
 }
 
 /*

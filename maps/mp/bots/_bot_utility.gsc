@@ -854,6 +854,52 @@ _timeout( delay )
 }
 
 /*
+	From newer gscs
+*/
+waittill_any_return( string1, string2, string3, string4, string5 )
+{
+	if ( ( !isdefined( string1 ) || string1 != "death" ) &&
+		( !isdefined( string2 ) || string2 != "death" ) &&
+		( !isdefined( string3 ) || string3 != "death" ) &&
+		( !isdefined( string4 ) || string4 != "death" ) &&
+		( !isdefined( string5 ) || string5 != "death" ) )
+	{
+		self endon( "death" );
+	}
+	
+	ent = spawnstruct();
+	
+	if ( isdefined( string1 ) )
+	{
+		self thread waittill_string( string1, ent );
+	}
+	
+	if ( isdefined ( string2 ) )
+	{
+		self thread waittill_string( string2, ent );
+	}
+	
+	if ( isdefined ( string3 ) )
+	{
+		self thread waittill_string( string3, ent );
+	}
+	
+	if ( isdefined ( string4 ) )
+	{
+		self thread waittill_string( string4, ent );
+	}
+	
+	if ( isdefined ( string5 ) )
+	{
+		self thread waittill_string( string5, ent );
+	}
+	
+	ent waittill( "returned", msg );
+	ent notify( "die" );
+	return msg;
+}
+
+/*
 	If the weapon  is allowed to be dropped
 */
 isWeaponDroppable( weap )
