@@ -1209,7 +1209,7 @@ aim_loop()
 			
 			if ( !isdefined( bone ) )
 			{
-				bone = "j_spineupper";
+				bone = "j_spine4";
 			}
 			
 			if ( self.bot.isfraggingafter || self.bot.issmokingafter || issubstr( "_grenade_", curweap ) )
