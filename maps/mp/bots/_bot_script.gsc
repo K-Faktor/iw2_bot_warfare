@@ -676,12 +676,12 @@ start_bot_threads()
 	self thread bot_listen_to_steps();
 	self thread bot_uav_think();
 
-	if ( getdvarint( "bots_play_nade" ) )
+	if ( getcvarint( "bots_play_nade" ) )
 	{
 		// self thread bot_use_grenade_think();
 	}
 
-	if ( getdvarint( "bots_play_obj" ) )
+	if ( getcvarint( "bots_play_obj" ) )
 	{
 	}
 }
