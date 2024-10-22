@@ -599,6 +599,7 @@ connected()
 
 	waittillframeend; // wait for waittills to process
 	level notify( "bot_connected", self );
+}
 
 /*
 	DEBUG
